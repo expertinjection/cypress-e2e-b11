@@ -39,9 +39,7 @@ describe('Test Cases Autimation Exercise', () => {
     cy.get('div>h2>b').should('be.visible').and('have.text', 'Account Created!')
     cy.get('a[data-qa="continue-button"]').click()
     cy.get('a>i.fa-user+b').should('be.visible')
-
   })
-
 });
 
 
