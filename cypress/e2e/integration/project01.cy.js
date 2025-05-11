@@ -2,121 +2,94 @@
 /// <reference types="cypress"/>
 describe("Cypress01 project ", () => {
   beforeEach(() => {
-    cy.visit("https://techglobal-training.com/frontend/login");
+    cy.visit("https://www.techglobal-training.com/frontend/form-elements");
   });
-  it("Test Case 01 - Validate the login form", () => {
-    cy.get("#username").should("be.visible").not(".required");
-    cy.get('[for="username"]').should(
-      "have.text",
-      "Please enter your username"
-    );
-    cy.get("#password").should("be.visible").not(".required");
-    cy.get('[for="password"]').should(
-      "have.text",
-      "Please enter your password"
-    );
-    cy.get("#login_btn")
-      .should("be.visible")
-      .and("not.be.disabled")
-      .and("have.text", "LOGIN");
-    cy.get('a[href="/frontend/login"]')
-      .should("be.visible")
-      .and("have.text", "Forgot Password?")
-      .and("not.be.disabled");
-  });
-  it("Test Case 02 - Validate the valid login", () => {
-    cy.get("#username").type("TechGlobal");
-    cy.get("#password").type("Test1234");
-    cy.get("#login_btn").click();
-    cy.get("#success_lgn").should("have.text", "You are logged in");
-    cy.get("#logout").should("be.visible").and("have.text", "LOGOUT");
-  });
+  it("TC01 - Validate the Contact Us information", () => {
+    cy.get(".is-size-3").as('header').should("be.visible").and('have.text', 'Contact Us')
+    const expectedText = ['2800 S River Rd Suite 310, Des Plaines, IL 60018','info@techglobalschool.com','(224) 580-2150']
+    cy.get('@header').nextAll().each((ele, index)=> {
+      cy.wrap(ele).should('have.text', expectedText[index])
+    })
+  })
+  it("TC02-Validate the Full name input box", () => {
+    cy.get('[for="name"]').parent().find('input').should('be.visible')
+      .and('have.attr','placeholder', 'Enter your full name')
+      .and('have.attr', 'required')
+      cy.get('[for="name"]').should('have.text', 'Full name *')
+  })
+  it('TC03-Validate the Gender radio button', () => {
+    cy.contains('Gender *').should('have.text', 'Gender *')
+    const expectedText =['Male', 'Female', 'Prefer not to disclose']
+    cy.get('.radio > input').first().should('have.attr', 'required')
+    cy.get('.radio > input').each(($ele, index) => {
+      cy.wrap($ele)
+        .parent()
+        .should('have.text', expectedText[index])
+      cy.wrap($ele).should('not.be.selected')
+        .and('be.enabled')
+    })
+    cy.CheckoptionAndValidateOthers('Male', expectedText)
+    cy.CheckoptionAndValidateOthers('Female', expectedText)
+    cy.CheckoptionAndValidateOthers('Prefer not to disclose', expectedText)
+  })
 
-  it("Test Case 03 - Validate the logout", () => {
-    cy.get("#username").type("TechGlobal");
-    cy.get("#password").type("Test1234");
-    cy.get("#login_btn").click();
-    cy.get("#logout").click();
-    cy.get('[for="username"]').should(
-      "have.text",
-      "Please enter your username"
-    );
-  });
-  it("Test Case 04 - Validate the Forgot Password? Link and Reset Password modal", () => {
-    cy.get('a[href="/frontend/login"]')
-      .should("be.visible")
-      .and("have.text", "Forgot Password?")
-      .click();
-    cy.get("#modal_title")
-      .should("be.visible")
-      .and("have.text", "Reset Password");
-    cy.get('button[aria-label="close"]').should("be.visible");
-    cy.get("#email").should("be.visible");
-    cy.get('label[for="email"]')
-      .should("be.visible")
-      .and(
-        "have.text",
-        "Enter your email address and we'll send you a link to reset your password. "
-      );
-    cy.get("#submit")
-      .should("be.visible")
-      .and("not.be.disabled")
-      .and("have.text", "SUBMIT");
-  });
-  it("Test Case 05 - Validate the Reset Password modal close button", () => {
-    cy.get('a[href="/frontend/login"]')
-      .should("be.visible")
-      .and("have.text", "Forgot Password?")
-      .click();
-    cy.get(".modal-card ").should("be.visible");
-    cy.get('button[aria-label="close"]').click();
-    cy.get('h1[class="is-size-3"]').should("have.text", "Login Form");
-  });
-  it("Test Case 06 - Validate the Reset Password form submission", () => {
-    cy.get('a[href="/frontend/login"]')
-      .should("be.visible")
-      .and("have.text", "Forgot Password?")
-      .click();
-    cy.get("#email").type("techgloabl67@gmail.com");
-    cy.get("#submit").click();
-    cy.get("#confirmation_message")
-      .should("be.visible")
-      .and(
-        "have.text",
-        "A link to reset your password has been sent to your email address."
-      );
-    cy.get("#submit").then(($submit) => {
-      const submitBottom = $submit[0].getBoundingClientRect().bottom;
+  const testCases = [
+    {
+     describtion: 'Address input box',
+     label: 'Address',
+     placeholder: 'Enter your address',
+     required: false
+    },
+    {
+      describtion: 'Email input box',
+      label: 'Email *',
+      placeholder: 'Enter your email',
+      required: true
+     },
+     {
+      describtion: 'Phone input box',
+      label: 'Phone',
+      placeholder: 'Enter your phone number',
+      required: false
+     },
+     {
+      describtion: 'Message text area',
+      label: 'Message',
+      placeholder: 'Type your message here...',
+      required: false
+     }
 
-      cy.get("#confirmation_message").then(($message) => {
-        const messageTop = $message[0].getBoundingClientRect().top;
-
-        expect(messageTop).to.be.greaterThan(submitBottom);
-      });
-    });
-  });
-  it("Test Case 07 - Validate the invalid login with the empty credentials", () => {
-    cy.get("#username").should("have.value", "");
-    cy.get("#password").should("have.value", "");
-    cy.get("#login_btn").click();
-    cy.get("#error_message").should("have.text", "Invalid Username entered!");
-  });
-  it("Test Case 08 - Validate the invalid login with the wrong username", () => {
-    cy.get("#username").type("John");
-    cy.get("#password").type("Test1234");
-    cy.get("#login_btn").click();
-    cy.get("#error_message").should("have.text", "Invalid Username entered!");
-  });
-  it("Test Case 09 - Validate the invalid login with the wrong password", () => {
-    cy.get("#username").type("TechGlobal");
-    cy.get("#password").type("1234");
-    cy.get("#login_btn").click();
-    cy.get("#error_message").should("have.text", "Invalid Password entered!");
-  });
-  it("Test Case 10 - Validate the invalid login with the wrong username and password", () => {
-    cy.get("#username").type("John");
-    cy.get("#password").type("1234");
-    cy.get("#login_btn").click();
-    cy.get("#error_message").should("have.text", "Invalid Username entered!");
-  });
-});
+  ]
+  testCases.forEach((test,index) => {
+    it(`TC 0${index + 4} - ${test.describtion}`,() => {
+      cy.contains('label', test.label).should('have.text', test.label)
+      cy.contains('label', test.label).parent().find('input, textarea')
+        .should('be.visible')
+        .and('have.attr', 'placeholder', test.placeholder)
+        .and(test.required ? 'have.attr' : 'not.have.attr', 'required')
+    })
+  })
+  it('TC 08 - Validate the Consent checkbox', () => {
+    cy.get('.checkbox > input').should('be.enabled')
+      .click().should('be.checked')
+      .click().should('not.be.checked')
+      .and('have.attr', 'required')
+  })
+  it('TC 09 - Validate the SUBMIT button', () => {
+    cy.get('.control > .button').should('be.visible')
+      .and('be.enabled')
+      .and('have.text', 'SUBMIT')
+  })
+  it('TC 10 - Validate the form submission', () => {
+    const inputs = ['haitham', '2800 S River Rd Suite 310, Des Plaines, IL 60018', 'info@techglobalschool.com', '(224) 580-2150', 'HELLLO']
+    cy.get('.control').find('.input, textarea').each(($el,index)=> {
+      cy.wrap($el).type(inputs[index])
+    })
+    cy.contains('label', 'Male').find('input').check()
+    cy.get('.checkbox').find('input').check()
+    cy.get('.control > button').click()
+    cy.on('uncaught:exception', () => {
+      return false
+    })
+  })
+})
