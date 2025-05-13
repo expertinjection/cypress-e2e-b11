@@ -8,3 +8,4 @@ cypress/screenshots/*
 cypress/downloads/*
 practiec.cy.js
 test.cy.js
+.env
