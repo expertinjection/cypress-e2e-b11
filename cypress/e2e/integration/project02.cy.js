@@ -19,14 +19,12 @@ describe("Cypress02 project", () => {
 
   it("Test Case 02 - Validate the valid login", () => {
     loginPage.userLogin("TechGlobal", "Test1234")
-    loginPage.getLoginBtn().click();
     loginPage.getSuccessLoginMsg().should("have.text", "You are logged in");
     loginPage.getLogoutBtn().should("be.visible").and("have.text", "LOGOUT");
   });
 
   it("Test Case 03 - Validate the logout", () => {
     loginPage.userLogin("TechGlobal", "Test1234")
-    loginPage.getLoginBtn().click();
     loginPage.getLogoutBtn().click();
     loginPage.getUsernameLabel().should("have.text", "Please enter your username");
   });
