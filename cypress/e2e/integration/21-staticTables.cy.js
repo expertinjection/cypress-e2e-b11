@@ -2,7 +2,7 @@ import TablesPage from "../../pages/TablesPage";
 describe("Static Tables", () => {
   const tablesPage = new TablesPage();
   beforeEach(() => {
-    cy.visit(`${Cypress.env("SITE_URL")}/frontend`);
+    //cy.visit(`${Cypress.env("SITE_URL")}/frontend`);
     cy.clickCard("Tables");
     cy.fixture("example").then(function (data) {
       this.headers = data.headers;

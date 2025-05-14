@@ -2,7 +2,7 @@
 
 describe("Cypress Custom Commands", () => {
   beforeEach(() => {
-    cy.visit("https://www.techglobal-training.com/frontend");
+    //cy.visit("https://www.techglobal-training.com/frontend");
     cy.clickCard("HTML Elements");
   });
 
