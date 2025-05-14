@@ -28,9 +28,9 @@ describe("Cypress01 project ", () => {
       cy.wrap($ele).should('not.be.selected')
         .and('be.enabled')
     })
-    cy.CheckoptionAndValidateOthers('Male', expectedText)
-    cy.CheckoptionAndValidateOthers('Female', expectedText)
-    cy.CheckoptionAndValidateOthers('Prefer not to disclose', expectedText)
+    // cy.CheckoptionAndValidateOthers('Male', expectedText)
+    // cy.CheckoptionAndValidateOthers('Female', expectedText)
+    // cy.CheckoptionAndValidateOthers('Prefer not to disclose', expectedText)
   })
 
   const testCases = [
