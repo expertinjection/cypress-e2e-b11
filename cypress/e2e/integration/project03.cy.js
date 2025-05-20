@@ -1,161 +1,73 @@
 /// <reference types="cypress"/>
+import BookingPage from "../../pages/BookingPage";
+const bookingpage = new BookingPage
 describe("Cypress03 project", () => {
-  beforeEach(() => {
-    cy.visit("https://www.techglobal-training.com/frontend/booking");
-  });
-  it("Test Case 01 - Validate the default Book your trip form", () => {
-    cy.get('input[value="One way"]')
-      .should("be.visible")
-      .and("be.enabled")
-      .and("have.attr", "checked");
-    cy.get('input[value="Round trip"]')
-      .should("be.visible")
-      .and("be.enabled")
-      .and("not.have.attr", "checked");
-    const data = [
-      "Cabin Class",
-      "From",
-      "To",
-      "Depart",
-      "Return",
-      "Number of passengers",
-      "Passenger 1"
-    ];
-    cy.get('div[class="field"]>.label').each((el, index) => {
-      cy.wrap(el).should("be.visible").and("have.text", data[index]);
+    beforeEach(() => {
+      cy.visit("https://www.techglobal-training.com/frontend/booking");
     });
-    cy.get('div[class="field"]>.select').each((el) => {
-      cy.wrap(el).should("be.visible");
+    it("Test Case 01 - Validate the default Book your trip form", () => {
+        bookingpage.gettripType('One way').should('be.visible').and('be.enabled').and('be.checked')
+        bookingpage.gettripType('Round trip').should('be.visible').and('be.enabled').and('not.be.checked')
+        bookingpage.validateDefulatvalus()
+        bookingpage.getBookButton().should('be.visible').and('be.enabled')
     });
-    cy.get('input[placeholder="MM/DD/YY"]').realClick();
-    cy.get('div[class="react-datepicker__month-container"]').should(
-      "be.visible"
-    );
-    cy.contains("Return")
-      .parent()
-      .find('input[placeholder="MM/DD/YY"]')
-      .should("be.visible")
-      .and("have.attr", "disabled");
-    cy.contains("Number of passengers")
-      .parent()
-      .find('option[value="1"]')
-      .should("have.value", "1");
-    cy.contains("Passenger 1")
-      .parent()
-      .find("option")
-      .should("have.value", "Adult (16-64)");
-    cy.get('button[class="Button_c_button__TmkRS null"]')
-      .should("be.visible")
-      .and("be.enabled");
-  });
-  it("Test Case 02 - Validate the Book your trip form when Round trip is selected", () => {
-    cy.get('input[value="Round trip"]').check().should("be.checked");
-    cy.get('input[value="One way"]').should("not.be.checked");
-    const data = [
-      "Cabin Class",
-      "From",
-      "To",
-      "Depart",
-      "Return",
-      "Number of passengers",
-      "Passenger 1"
-    ];
-
-    cy.get('div[class="field"]>.label').each((el, index) => {
-      cy.wrap(el).should("be.visible").and("have.text", data[index]);
+    it("Test Case 02 - Validate the Book your trip form when Round trip is selected", () => {
+        bookingpage.gettripType('Round trip').realClick().should('be.checked')
+        bookingpage.gettripType('One way').should('not.be.checked')
+        bookingpage.validateDefulatvalus()
+        bookingpage.getBookButton().should('be.visible').and('be.enabled')
     });
+    it('Test Case 03 - Validate the booking for 1 passenger and one way', () =>{
+        bookingpage.gettripType('One way').realClick()
+        bookingpage.selectCabinClass('Business')
+        bookingpage.selectLocation('Illinois', 'Florida')
+        bookingpage.selectDate('Tue May 27 2025')
+        //bookingpage.selectPassengersCount(1)
+        bookingpage.selectPassengers('Senior (65+)', 1)
+        bookingpage.getBookButton().realClick()
+        bookingpage.getDepartHeader().should('have.text', 'DEPART')
+        bookingpage.getFromTodes().should('have.text', 'IL to FL')
+        bookingpage.getDepatrueDate().should('have.text', 'Tue May 27 2025')
+        bookingpage.getPassengersCount().should('contain','1')
+        bookingpage.getPassengersType().should('contain', 'Senior (65+)')
+        bookingpage.getCabinClass().should('contain', 'Business')
 
-    cy.get('div[class="field"]>.select').each((el) => {
-      cy.wrap(el).should("be.visible");
+        
+
     });
-    cy.get('input[placeholder="MM/DD/YY"]')
-      .first()
-      .should("be.visible")
-      .and("not.be.disabled");
-    cy.contains("Return")
-      .parent()
-      .find('input[placeholder="MM/DD/YY"]')
-      .should("be.visible")
-      .and("not.be.disabled");
-    cy.contains("Number of passengers")
-      .parent()
-      .find("select")
-      .should("have.value", "1");
-
-    cy.contains("Passenger 1")
-      .parent()
-      .find("select")
-      .should("have.value", "Adult (16-64)");
-
-    cy.get('button[class="Button_c_button__TmkRS null"]')
-      .should("be.visible")
-      .and("be.enabled");
-  });
-  it('Test Case 03 - Validate the booking for 1 passenger and one way', () =>{
-    cy.get('input[value="One way"]').check()
-    cy.get('select').eq(0).select('Business')
-    cy.get('select').eq(1).select('Illinois')
-    cy.get('select').eq(2).select('Florida')
-    cy.get('input[placeholder="MM/DD/YY"]').eq(0).realClick()
-    cy.get('.react-datepicker-ignore-onclickoutside')
-    cy.get('div[aria-label="Choose Tuesday, May 27th, 2025"]').realClick()
-    cy.get('select').eq(3).select('1')
-    cy.get('select').eq(4).select('Senior (65+)')
-    cy.get('.Button_c_button__TmkRS').click()
-
-    cy.get('.ml-3').find('h1').should('contain', 'DEPART');
-    cy.get('.ml-3').find('h3').eq(0).should('contain', 'IL to FL'); 
-    cy.get('.ml-3').find('p').eq(0).should('contain', 'Tue May 27 2025');
-    cy.get('.ml-3').find('p').eq(1).should('contain', 'Number of Passengers: 1');
-    cy.get('.ml-3').find('p').eq(2).should('contain', 'Passenger 1: Senior (65+)');
-    cy.get('.ml-3').find('p').eq(3).should('contain', 'Cabin class: Business');
-
-  });
-  it('Test Case 04 - Validate the booking for 1 passenger and round trip', () => {
-    cy.get('input[value="Round trip"]').check()
-    cy.get('select').eq(0).select('First')
-    cy.get('select').eq(1).select('California')
-    cy.get('select').eq(2).select('Illinois')
-    cy.get('input[placeholder="MM/DD/YY"]').eq(0).realClick()
-    cy.get('.react-datepicker-ignore-onclickoutside')
-    cy.get('div[aria-label="Choose Tuesday, May 27th, 2025"]').realClick()
-    cy.get('input[placeholder="MM/DD/YY"]').eq(1).realClick()
-    cy.get('button[aria-label="Next Month"]').realClick()
-    cy.get('div[aria-label="Choose Friday, June 27th, 2025"]').realClick()
-    cy.get('select').eq(3).select('1')
-    cy.get('select').eq(4).select('Adult (16-64)')
-    cy.get('.Button_c_button__TmkRS').click()
-
-    cy.get('.ml-3').find('h1').eq(0).should('contain', 'DEPART');
-    cy.get('.ml-3').find('h1').eq(1).should('contain', 'RETURN');
-    cy.get('.ml-3').find('h3').eq(0).should('contain', 'CA to IL'); 
-    cy.get('.ml-3').find('h3').eq(1).should('contain', 'IL to CA'); 
-
-    cy.get('.ml-3').find('p').eq(0).should('contain', 'Tue May 27 2025');
-    cy.get('.ml-3').find('p').eq(1).should('contain', 'Fri Jun 27 2025');
-    cy.get('.ml-3').find('p').eq(2).should('contain', 'Number of Passengers: 1');
-    cy.get('.ml-3').find('p').eq(3).should('contain', 'Passenger 1: Adult (16-64)');
-    cy.get('.ml-3').find('p').eq(4).should('contain', 'Cabin class: First');
+    it('Test Case 04 - Validate the booking for 1 passenger and round trip', () => {
+        bookingpage.gettripType('Round trip').realClick()
+        bookingpage.selectCabinClass('First')
+        bookingpage.selectLocation('California', 'Illinois')
+        bookingpage.selectDate('Tue May 27 2025', 'Fri Jun 27 2025')
+        //bookingpage.selectPassengersCount(1)
+        bookingpage.selectPassengers('Adult (16-64)', 1)
+        bookingpage.getBookButton().realClick()
+        bookingpage.getDepartHeader().should('have.text', 'DEPART')
+        bookingpage.getReturnHeader().should('have.text', 'RETURN')
+        bookingpage.getFromTodes().should('have.text', 'CA to IL')
+        bookingpage.getFromToReturnDes().should('have.text', 'IL to CA')
+        bookingpage.getDepatrueDate().should('have.text', 'Tue May 27 2025')
+        bookingpage.getReturnDate().should('have.text', 'Fri Jun 27 2025')
+        bookingpage.getPassengersCount().should('contain','1')
+        bookingpage.getPassengersType().should('contain', 'Adult (16-64)')
+        bookingpage.getCabinClass().should('contain', 'First')
+    })
+    it('Test Case 05 - Validate the booking for 2 passengers and one way', () => {
+        bookingpage.gettripType('One way').realClick()
+        bookingpage.selectCabinClass('Premium Economy')
+        bookingpage.selectLocation('New York', 'Texas')
+        bookingpage.selectDate('Wed May 21 2025')
+        bookingpage.selectPassengersCount(2)
+        bookingpage.getPassengersType().type('Adult (16-64)')
+        bookingpage.getPassengerType2().type('Child (2-11)')
+        bookingpage.getBookButton().realClick()
+        bookingpage.getDepartHeader().should('have.text', 'DEPART')
+        bookingpage.getFromTodes().should('have.text', 'NY to TX')
+        bookingpage.getDepatrueDate().should('have.text', 'Wed May 21 2025')
+        bookingpage.getPassengersCount().should('contain','2')
+        bookingpage.getPassengersType().should('contain', 'Adult (16-64)', 'Child (2-11)')
+        bookingpage.getCabinClass().should('contain', 'Premium Economy')
+    })
   })
-  it('Test Case 05 - Validate the booking for 2 passengers and one way', () => {
-    cy.get('input[value="One way"]').check()
-    cy.get('select').eq(0).select('Premium Economy')
-    cy.get('select').eq(1).select('New York')
-    cy.get('select').eq(2).select('Texas')
-    cy.get('input[placeholder="MM/DD/YY"]').eq(0).realClick()
-    cy.get('.react-datepicker-ignore-onclickoutside')
-    cy.get('div[aria-label="Choose Wednesday, May 21st, 2025"]').realClick()
-    cy.get('select').eq(3).select('2')
-    cy.get('select').eq(4).select('Adult (16-64)')
-    cy.get('select').eq(5).select('Child (2-11)')
-    cy.get('.Button_c_button__TmkRS').click()
-
-    cy.get('.ml-3').find('h1').should('contain', 'DEPART');
-    cy.get('.ml-3').find('h3').eq(0).should('contain', 'NY to TX'); 
-    cy.get('.ml-3').find('p').eq(0).should('contain', 'Wed May 21 2025');
-    cy.get('.ml-3').find('p').eq(1).should('contain', 'Number of Passengers: 2');
-    cy.get('.ml-3').find('p').eq(2).should('contain', 'Passenger 1: Adult (16-64)');
-    cy.get('.ml-3').find('p').eq(3).should('contain', 'Passenger 2: Child (2-11)');
-    cy.get('.ml-3').find('p').eq(4).should('contain', 'Cabin class: Premium Economy');
-  })
-})
+  
