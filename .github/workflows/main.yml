@@ -1,38 +1,31 @@
-name: End-to-end tests
-on: 
-  # Trigger workflow on any push to any branch
+name: Smart App - Smoke Tests
+on:
   push:
-  # Trigger workflow on scheduled basis
-  schedule:
-    - cron: '30 2 * * 6' # Run every Saturday at 2:30 AM UTC
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    env:
+      APP_BASE_URL: ${{ vars.APP_BASE_URL }}
+      USERNAME: ${{ vars.USERNAME }}
+      PASSWORD: ${{ vars.PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      # Install npm dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
+
+      - name: Install Dependencies and Run Smoke Tests
         uses: cypress-io/github-action@v6
         with:
-          # browser: chrome
-          # headed: false
-          # spec: cypress/e2e/spec1.cy.js
+          browser: chrome
+          headed: false
           command: npm run test:smoke
-
-      - name: Artifacts
+      - name: Publish Test Reports
+        if: always()
         uses: actions/upload-artifact@v4
-        # add the line below to store screenshots only on failures
-         if: always()
         with:
-          name: Cypress Reports
-          path: cypress/reports/html/index.html
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-
-      # - name: Deploy
-      #   uses: peaceiris/actions-gh-pages@v4
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: cypress/reports/html
+          name: Cypress HTML Reports
+          path: cypress/reports/
+          if-no-files-found: ignore
